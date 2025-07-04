@@ -22,7 +22,9 @@
 <script setup>
 import { reactive, ref } from 'vue';
 import axios from 'axios';
+import { useRouter } from 'vue-router';
 
+const router = useRouter();
 const form = reactive({ name: '', email: '', password: '', password_confirmation: ''});
 const error = ref('');
 
@@ -30,8 +32,9 @@ async function register(){
   try {
     const { data } = await axios.post('/api/register', form);
     localStorage.setItem('token', data.token);
+    axios.defaults.headers.common['Authorization'] = `Bearer ${data.token}`;
     error.value = '';
-    alert('Registration Successful!');
+    router.push('/users');
   } catch (err) {
     error.value = 'Registration failed';
   }

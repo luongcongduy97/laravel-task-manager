@@ -26,9 +26,9 @@ async function login() {
   try {
     const { data } = await axios.post('/api/login', form);
     localStorage.setItem('token', data.token);
+    axios.defaults.headers.common['Authorization'] = `Bearer ${data.token}`;
     error.value = '';
-    alert('Logged in!');
-    // redirect or further logic
+    router.push('/users');
   } catch (e) {
     error.value = 'Invalid credentials';
   }

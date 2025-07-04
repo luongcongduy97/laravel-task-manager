@@ -2,9 +2,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>My Laravel Home</title>
+    <title>Task Manager</title>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body>
-    <h1>Welcome to My Laravel App 🎉</h1>
+    <div id="app"></div>
 </body>
 </html>

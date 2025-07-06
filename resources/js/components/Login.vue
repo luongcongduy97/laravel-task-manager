@@ -1,15 +1,15 @@
 <template>
-  <form @submit.prevent="login" class="bg-white p-6 rounded shadow w-80 space-y-4">
-    <h2 class="text-xl font-semibold text-center">Login</h2>
+  <form @submit.prevent="login" class="fade-in bg-white/80 backdrop-blur-md p-8 rounded-lg shadow-xl w-96 space-y-5">
+    <h2 class="text-2xl font-bold text-center text-gray-700">Welcome back</h2>
     <div>
-      <input v-model="form.email" type="email" placeholder="Email" class="w-full border px-3 py-2 rounded" required>
+      <input v-model="form.email" type="email" placeholder="Email" class="w-full border px-4 py-2 rounded focus:ring-2 focus:ring-purple-500 outline-one transition" required>
     </div>
     <div>
-      <input v-model="form.password" type="password" placeholder="Password" class="w-full border px-3 py-2 rounded" required>
+      <input v-model="form.password" type="password" placeholder="Password" class="w-full border px-4 py-2 rounded focus:ring-2 focus:ring-purple-500 outline-one transition" required>
     </div>
     <div v-if="error" class="text-red-500 text-sm">{{ error }}</div>
-    <button type="submit" class="w-full bg-blue-500 text-white py-2 rounded">Login</button>
-    <p class="text-sm text-center">Don't have an account? <router-link to="/register" class="text-blue-500">Register</router-link></p>
+    <button type="submit" class="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-pink-500 hover:to-purple-500 text-white py-2 rounded-lg shadow-md transition transform hover:scale-105">Login</button>
+    <p class="text-sm text-center text-gray-600">Don't have an account? <router-link to="/register" class="text-purple-600 hover:underline">Register</router-link></p>
   </form>
 </template>
 

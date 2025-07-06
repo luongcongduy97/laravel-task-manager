@@ -1,33 +1,33 @@
 <template>
-  <div class="bg-white p-6 rounded shadow w-full max-w-2xl space-y-4">
-    <h2 class="text-xl font-semibold text-center">User Page</h2>
+  <div class="fade-in bg-white/80 backdrop-blur-md p-6 rounded-lg shadow-xl w-full max-w-3xl space-y-4">
+    <h2 class="text-2xl font-bold text-center text-gray-700">User Dashboard</h2>
     <div v-if="user">
       <p class="font-semibold">Logged in as: {{ user.name }} ({{ user.role }})</p>
     </div>
     <div v-if="isAdmin">
       <h3 class="text-lg font-semibold mt-4">All Users</h3>
-      <table class="w-full text-left border">
-        <thead>
+      <table class="w-full text-left border rounded overflow-hidden">
+        <thead class="bg-gradient-to-r from-purple-500 to-pink-500 text-white">
           <tr>
-            <th class="border px-2">Name</th>
-            <th class="border px-2">Email</th>
-            <th class="border px-2">Role</th>
-            <th class="border px-2">Actions</th>
+            <th class="px-2 py-1">Name</th>
+            <th class="px-2 py-1">Email</th>
+            <th class="px-2 py-1">Role</th>
+            <th class="px-2 py-1">Actions</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="u in users" :key="u.id">
-            <td class="border px-2">{{ u.name }}</td>
-            <td class="border px-2">{{ u.email }}</td>
-            <td class="border px-2">
-              <select v-model="u.role" @change="changeRole(u)" class="border rounded px-1">
+            <td class="border px-2 py-1">{{ u.name }}</td>
+            <td class="border px-2 py-1">{{ u.email }}</td>
+            <td class="border px-2 py-1">
+              <select v-model="u.role" @change="changeRole(u)" class="border rounded px-1 focus:ring-2 focus:ring-purple-500 outline-none transition">
                 <option value="Admin">Admin</option>
                 <option value="Manager">Manager</option>
                 <option value="Member">Member</option>
               </select>
             </td>
-            <td class="border px-2 text-center">
-              <button @click="removeUser(u)" class="text-red-500">Delete</button>
+            <td class="border px-2 py-1 text-center">
+              <button @click="removeUser(u)" class="text-red-600 hover:text-red-800 transition">Delete</button>
             </td>
           </tr>
         </tbody>

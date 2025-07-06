@@ -40,6 +40,7 @@
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
 import { useRouter } from 'vue-router';
+import { isAuthenticated } from '../auth.js';
 
 const router = useRouter();
 const user = ref(null);
@@ -71,6 +72,7 @@ onMounted(() => {
     router.push('/login');
   } else {
     axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    isAuthenticated.value = true;
     fetchUser();
   }
 });

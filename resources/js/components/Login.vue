@@ -17,6 +17,7 @@
 import { reactive, ref } from 'vue';
 import axios from 'axios';
 import { useRouter } from 'vue-router';
+import { isAuthenticated } from '../auth.js';
 
 const router = useRouter();
 const form = reactive({ email: '', password: '' });
@@ -27,6 +28,7 @@ async function login() {
     const { data } = await axios.post('/api/login', form);
     localStorage.setItem('token', data.token);
     axios.defaults.headers.common['Authorization'] = `Bearer ${data.token}`;
+    isAuthenticated.value = true;
     error.value = '';
     router.push('/users');
   } catch (e) {

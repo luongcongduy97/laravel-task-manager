@@ -29,6 +29,8 @@ const showLogout = computed(() => {
   return isAuthenticated.value && route.path !== '/login' && route.path !== '/register';
 });
 
+const showTeamLink = computed(() => isAuthenticated.value);
+
 async function logout() {
   await axios.post('/api/logout');
   localStorage.removeItem('token');

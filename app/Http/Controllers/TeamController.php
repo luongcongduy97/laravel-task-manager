@@ -58,4 +58,15 @@ class TeamController extends Controller
 
     return response()->json($user, 201);
   }
+
+  public function destroy(Request $request, Team $team)
+  {
+    if ($request->user()->role !== 'Admin') {
+      return response()->json(['message' => 'Forbidden'], 403);
+    }
+
+    $team->delete();
+
+    return response()->noContent();
+  }
 }

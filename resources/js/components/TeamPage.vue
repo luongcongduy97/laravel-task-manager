@@ -18,6 +18,7 @@
           </form>
           <p v-if="inviteData[team.id].message" class="text-green-600">{{ inviteData[team.id].message }}</p>
           <p v-if="inviteData[team.id].error" class="text-red-600">{{ inviteData[team.id].error }}</p>
+          <button @click="removeTeam(team.id)" data-test="delete-team" class="text-red-600 hover:text-red-800">Delete Team</button>
         </div>
       </li>
     </ul>
@@ -78,5 +79,11 @@
         entry.error = err.message;
       }
     }
+  }
+
+  async function removeTeam(teamId) {
+    await axios.delete(`/api/teams/${teamId}`);
+    teams.value = teams.value.filter(t => t.id !== teamId);
+    delete inviteData.value[teamId];
   }
 </script>

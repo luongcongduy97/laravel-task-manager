@@ -1,12 +1,25 @@
 <template>
   <div class="fade-in bg-white/80 backdrop-blur-md p-6 rounded-lg shadow-xl w-full max-w-xl space-y-4">
-    <h2 class="text-2xl font-bold text-center text-gray-700">Team Invitation</h2>
-    <form @submit.prevent="invite" class="space-y-2">
-      <input v-model="name" type="text" placeholder="Name" class="w-full border px-2 py-1 rounded" required>
-      <input v-model="email" type="email" placeholder="Email" class="w-full border px-2 py-1 rounded" required>
-      <button type="submit" class="bg-purple-500 hover:bg-purple-600 text-white px-3 py-1 rounded">Invite</button>
-    </form>
-    <p v-if="message" class="text-green-600">{{ message }}</p>
+    <h2 class="text-2xl font-bold text-center text-gray-700">Teams</h2>
+
+    <div v-if="isAdmin" class="flex space-x-2">
+      <input v-model="newTeamName" placeholder="Team name" class="border px-2 py-1 rounded w-full">
+      <button @click="addTeam" class="bg-purple-500 hover:bg-purple-600 text-white px-3 py-1 rounded">Add Team</button>
+    </div>
+
+    <ul class="space-y-4">
+      <li v-for="team in teams" :key="team.id" class="border p-3 rounded">
+        <h3 class="font-semibold">{{ team.name }}</h3>
+        <div v-if="isAdmin" class="mt-2 space-y-2">
+          <form @submit.prevent="invite(team.id)" class="space-y-2 flex flex-col sm:flex-row sm:space-x-2 sm:space-y-0">
+            <input v-model="inviteData[team.id].name" type="text" placeholder="Name" class="border px-2 py-1 rounded" required>
+            <input v-model="inviteData[team.id].email" type="email" placeholder="Email" class="border px-2 py-1 rounded" required>
+            <button type="submit" class="bg-purple-500 hover:bg-purple-600 text-white px-3 py-1 rounded">Invite</button>
+          </form>
+          <p v-if="inviteData[team.id].message" class="text-green-600">{{ inviteData[team.id].message }}</p>
+        </div>
+      </li>
+    </ul>
   </div>
 </template>
 

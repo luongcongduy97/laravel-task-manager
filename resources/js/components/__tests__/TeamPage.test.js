@@ -31,4 +31,18 @@ describe('TeamPage', () => {
       email: 'invite@example.com'
     });
   });
+
+  it('deletes team', async () => {
+    axios.get
+      .mockResolvedValueOnce({ data: { role: 'Admin' } })
+      .mockResolvedValueOnce({ data: [{ id: 1, name: 'Team 1' }] });
+    axios.delete.mockResolvedValue({});
+
+    const wrapper = mount(TeamPage);
+    await flushPromises();
+
+    await wrapper.find('[data-test="delete-team"]').trigger('click');
+
+    expect(axios.delete).toHaveBeenCalledWith('/api/teams/1');
+  });
 });

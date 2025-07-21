@@ -17,6 +17,7 @@
             <button type="submit" class="bg-purple-500 hover:bg-purple-600 text-white px-3 py-1 rounded">Invite</button>
           </form>
           <p v-if="inviteData[team.id].message" class="text-green-600">{{ inviteData[team.id].message }}</p>
+          <p v-if="inviteData[team.id].error" class="text-red-600">{{ inviteData[team.id].error }}</p>
         </div>
       </li>
     </ul>
@@ -50,22 +51,32 @@
 
     const res = await axios.get('/api/teams');
     teams.value = res.data;
-    teams.value.forEach(t => inviteData.value[t.id] = { name: '', email: '', message: '' });
+    teams.value.forEach(t => inviteData.value[t.id] = { name: '', email: '', message: '', error: '' });
   });
 
   async function addTeam() {
     if (!newTeamName.value) return;
     const { data } = await axios.post('/api/teams', { name: newTeamName.value });
     teams.value.push(data);
-    inviteData.value[data.id] = { name: '', email: '', message: '' };
+    inviteData.value[data.id] = { name: '', email: '', message: '', error: '' };
     newTeamName.value = '';
   }
 
   async function invite(teamId) {
     const entry = inviteData.value[teamId];
-    const { data } = await axios.post(`/api/teams/${teamId}/invite`, { name: entry.name, email: entry.email });
-    entry.message = `Invited ${data.email}`;
-    entry.name = '';
-    entry.email = '';
+    entry.message = '';
+    entry.error = '';
+    try {
+      const { data } = await axios.post(`/api/teams/${teamId}/invite`, { name: entry.name, email: entry.email });
+      entry.message = `Invited ${data.email}`;
+      entry.name = '';
+      entry.email = '';
+    } catch (err) {
+      if (err.response?.data?.message) {
+        entry.error = err.response.data.message;
+      } else {
+        entry.error = err.message;
+      }
+    }
   }
 </script>

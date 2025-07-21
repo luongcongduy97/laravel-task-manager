@@ -3,6 +3,12 @@
     <h2 class="text-2xl font-bold text-center text-gray-700">User Dashboard</h2>
     <div v-if="user">
       <p class="font-semibold">Logged in as: {{ user.name }} ({{ user.role }})</p>
+      <div v-if="teams.length" class="mt-2">
+        <h3 class="font-semibold">Your Teams</h3>
+        <ul class="list-disc pl-5">
+          <li v-for="t in teams" :key="t.id">{{ t.name }}</li>
+        </ul>
+      </div>
     </div>
     <div v-if="isAdmin">
       <h3 class="text-lg font-semibold mt-4">All Users</h3>
@@ -37,43 +43,45 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
-import axios from 'axios';
-import { useRouter } from 'vue-router';
-import { isAuthenticated } from '../auth.js';
+  import { ref, onMounted } from 'vue';
+  import axios from 'axios';
+  import { useRouter } from 'vue-router';
+  import { isAuthenticated } from '../auth.js';
 
-const router = useRouter();
-const user = ref(null);
-const users = ref([]);
-const isAdmin = ref(false);
+  const router = useRouter();
+  const user = ref(null);
+  const users = ref([]);
+  const isAdmin = ref(false);
+  const teams = ref([]);
 
-async function fetchUser() {
-  const { data } = await axios.get('/api/user');
-  user.value = data;
-  isAdmin.value = data.role === 'Admin';
-  if (isAdmin.value) {
-    const res = await axios.get('/api/users');
-    users.value = res.data;
+  async function fetchUser() {
+    const { data } = await axios.get('/api/user');
+    user.value = data;
+    teams.value = data.teams || [];
+    isAdmin.value = data.role === 'Admin';
+    if (isAdmin.value) {
+      const res = await axios.get('/api/users');
+      users.value = res.data;
+    }
   }
-}
 
-async function changeRole(u) {
-  await axios.put(`/api/users/${u.id}`, { role: u.role });
-}
-
-async function removeUser(u) {
-  await axios.delete(`/api/users/${u.id}`);
-  users.value = users.value.filter(item => item.id !== u.id);
-}
-
-onMounted(() => {
-  const token = localStorage.getItem('token');
-  if (!token) {
-    router.push('/login');
-  } else {
-    axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-    isAuthenticated.value = true;
-    fetchUser();
+  async function changeRole(u) {
+    await axios.put(`/api/users/${u.id}`, { role: u.role });
   }
-});
+
+  async function removeUser(u) {
+    await axios.delete(`/api/users/${u.id}`);
+    users.value = users.value.filter(item => item.id !== u.id);
+  }
+
+  onMounted(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      router.push('/login');
+    } else {
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      isAuthenticated.value = true;
+      fetchUser();
+    }
+  });
 </script>

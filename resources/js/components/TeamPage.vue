@@ -26,30 +26,46 @@
 <script setup>
   import { ref, onMounted } from 'vue';
   import axios from 'axios';
-  import { useRoute, useRouter } from 'vue-router';
+  import { useRouter } from 'vue-router';
   import { isAuthenticated } from '../auth.js';
 
-  const route = useRoute();
   const router = useRouter();
-  const name = ref('');
-  const email = ref('');
-  const message = ref('');
+  const teams = ref([]);
+  const isAdmin = ref(false);
+  const inviteData = ref({});
+  const newTeamName = ref('');
 
-  onMounted(() => {
+  onMounted(async () => {
     const token = localStorage.getItem('token');
     if (!token) {
       router.push('/login');
-    } else {
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-      isAuthenticated.value = true;
+      return;
     }
+
+    axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    isAuthenticated.value = true;
+
+    const userRes = await axios.get('/api/user');
+    isAdmin.value = userRes.data.role === 'Admin';
+
+    const res = await axios.get('/api/teams');
+    teams.value = res.data;
+    teams.value.forEach(t => inviteData.value[t.id] = { name: '', email: '', message: '' });
   });
 
-  async function invite() {
-    const teamId = route.params.teamId || 1;
-    const { data } = await axios.post(`/api/teams/${teamId}/invite`, { name: name.value, email: email.value });
-    message.value = `Invited ${data.email}`;
-    name.value = '';
-    email.value = '';
+  async function addTeam() {
+    if (!newTeamName.value) return;
+    const { data } = await axios.post('/api/teams', { name: newTeamName.value });
+    teams.value.push(data);
+    inviteData.value[data.id] = { name: '', email: '', message: '' };
+    newTeamName.value = '';
+  }
+
+  async function invite(teamId) {
+    const entry = inviteData.value[teamId];
+    const { data } = await axios.post(`/api/teams/${teamId}/invite`, { name: entry.name, email: entry.email });
+    entry.message = `Invited ${data.email}`;
+    entry.name = '';
+    entry.email = '';
   }
 </script>

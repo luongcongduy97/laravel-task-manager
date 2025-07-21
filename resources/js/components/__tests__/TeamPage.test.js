@@ -1,4 +1,4 @@
-import { mount } from '@vue/test-utils';
+import { mount, flushPromises } from '@vue/test-utils';
 import { describe, it, expect, vi } from 'vitest';
 import TeamPage from '../TeamPage.vue';
 import axios from 'axios';
@@ -14,9 +14,13 @@ vi.mock('../../auth.js', () => ({
 
 describe('TeamPage', () => {
   it('sends invite', async () => {
+    axios.get
+      .mockResolvedValueOnce({ data: { role: 'Admin' } })
+      .mockResolvedValueOnce({ data: [{ id: 1, name: 'Team 1' }] });
     axios.post.mockResolvedValue({ data: { email: 'invite@example.com' } });
 
     const wrapper = mount(TeamPage);
+    await flushPromises();
 
     await wrapper.find('input[placeholder="Name"]').setValue('Invitee');
     await wrapper.find('input[placeholder="Email"]').setValue('invite@example.com');

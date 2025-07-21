@@ -4,7 +4,7 @@
     <div class="flex items-center space-x-4">
       <router-link
         v-if="showTeamLink"
-        to="/teams/1"
+        to="/teams"
         class="text-gray-700 hover:text-gray-900 text-sm sm:text-base"
       >Team</router-link>
       <button
@@ -17,25 +17,35 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
-import axios from 'axios';
-import { useRouter, useRoute } from 'vue-router';
-import { isAuthenticated } from '../auth.js';
+  import { computed, ref, onMounted } from 'vue';
+  import axios from 'axios';
+  import { useRouter, useRoute } from 'vue-router';
+  import { isAuthenticated } from '../auth.js';
 
-const router = useRouter();
-const route = useRoute();
+  const router = useRouter();
+  const route = useRoute();
 
-const showLogout = computed(() => {
-  return isAuthenticated.value && route.path !== '/login' && route.path !== '/register';
-});
+  const isAdmin = ref(false);
 
-const showTeamLink = computed(() => isAuthenticated.value);
+  const showLogout = computed(() => {
+    return isAuthenticated.value && route.path !== '/login' && route.path !== '/register';
+  });
 
-async function logout() {
-  await axios.post('/api/logout');
-  localStorage.removeItem('token');
-  delete axios.defaults.headers.common['Authorization'];
-  isAuthenticated.value = false;
-  router.push('/login');
-}
+  const showTeamLink = computed(() => isAuthenticated.value && isAdmin.value);
+
+  onMounted(async () => {
+    if (isAuthenticated.value) {
+      const { data } = await axios.get('/api/user');
+      isAdmin.value = data.role === 'Admin';
+    }
+  });
+
+  async function logout() {
+    await axios.post('/api/logout');
+    localStorage.removeItem('token');
+    delete axios.defaults.headers.common['Authorization'];
+    isAuthenticated.value = false;
+    isAdmin.value = false;
+    router.push('/login');
+  }
 </script>

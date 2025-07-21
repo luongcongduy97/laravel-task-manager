@@ -10,7 +10,7 @@ const routes = [
   { path: '/login', component: Login },
   { path: '/register', component: Register },
   { path: '/users', component: UserPage, meta: { requiresAuth: true } },
-  { path: '/teams/:teamId', component: TeamPage, meta: { requiresAuth: true } },
+  { path: '/teams', component: TeamPage, meta: { requiresAuth: true } },
 ];
 
 const router = createRouter({

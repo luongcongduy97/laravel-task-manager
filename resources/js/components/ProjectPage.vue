@@ -1,27 +1,75 @@
 <template>
-  <div class="fade-in bg-white/80 backdrop-blur-md p-6 rounded-lg shadow-xl w-full max-w-xl space-y-4">
-    <h2 class="text-2xl font-bold text-center text-gray-700">Projects</h2>
-    <div class="flex space-x-2">
-      <input v-model="newProject.name" placeholder="Name" class="border px-2 py-1 rounded w-full" />
-      <input v-model="newProject.description" placeholder="Description" class="border px-2 py-1 rounded w-full" />
-      <button @click="addProject" class="bg-purple-500 hover:bg-purple-600 text-white px-3 py-1 rounded">Add</button>
+  <div class="fade-in bg-white/80 backdrop-blur-md p-6 rounded-2xl shadow-2xl w-full max-w-3xl space-y-6">
+    <h2 class="text-3xl font-extrabold bg-gradient-to-r from-purple-600 to-pink-500 text-transparent bg-clip-text text-center">
+      Projects
+    </h2>
+
+    <div class="flex flex-col sm:flex-row sm:space-x-3 space-y-3 sm:space-y-0">
+      <input
+        v-model="newProject.name"
+        placeholder="Project name"
+        class="border px-3 py-2 rounded-md w-full focus:ring-2 focus:ring-purple-500 transition"
+      />
+      <input
+        v-model="newProject.description"
+        placeholder="Description"
+        class="border px-3 py-2 rounded-md w-full focus:ring-2 focus:ring-purple-500 transition"
+      />
+      <button
+        @click="addProject"
+        class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md font-semibold transition"
+      >
+        Add
+      </button>
     </div>
-    <ul class="space-y-4">
-      <li v-for="p in projects" :key="p.id" class="border p-3 rounded">
+
+    <ul class="space-y-5">
+      <li
+        v-for="p in projects"
+        :key="p.id"
+        class="border rounded-xl p-5 shadow-sm hover:shadow-md transition bg-white"
+      >
+        <!-- Normal View -->
         <div v-if="!editData[p.id].editing">
-          <h3 class="font-semibold">{{ p.name }}</h3>
-          <p class="text-sm text-gray-600" v-if="p.description">{{ p.description }}</p>
-          <div class="space-x-2 mt-2">
-            <button @click="startEdit(p.id)" class="text-blue-600 hover:text-blue-800">Edit</button>
-            <button @click="removeProject(p.id)" class="text-red-600 hover:text-red-800" data-test="delete-project">Delete</button>
+          <h3 class="text-lg font-semibold text-gray-800">{{ p.name }}</h3>
+          <p class="text-sm text-gray-600 mt-1" v-if="p.description">{{ p.description }}</p>
+          <div class="flex space-x-4 mt-3">
+            <button @click="startEdit(p.id)" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+              Edit
+            </button>
+            <button
+              @click="removeProject(p.id)"
+              class="text-red-600 hover:text-red-800 text-sm font-medium"
+              data-test="delete-project"
+            >
+              Delete
+            </button>
           </div>
         </div>
-        <div v-else class="space-y-2">
-          <input v-model="editData[p.id].name" class="border px-2 py-1 rounded w-full" />
-          <input v-model="editData[p.id].description" class="border px-2 py-1 rounded w-full" />
-          <div class="space-x-2">
-            <button @click="updateProject(p.id)" class="bg-purple-500 hover:bg-purple-600 text-white px-3 py-1 rounded">Save</button>
-            <button @click="cancelEdit(p.id)" class="text-gray-600 hover:text-gray-800">Cancel</button>
+
+        <!-- Edit Mode -->
+        <div v-else class="space-y-3">
+          <input
+            v-model="editData[p.id].name"
+            class="border px-3 py-2 rounded-md w-full focus:ring-2 focus:ring-purple-500 transition"
+          />
+          <input
+            v-model="editData[p.id].description"
+            class="border px-3 py-2 rounded-md w-full focus:ring-2 focus:ring-purple-500 transition"
+          />
+          <div class="flex space-x-3">
+            <button
+              @click="updateProject(p.id)"
+              class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md font-semibold transition"
+            >
+              Save
+            </button>
+            <button
+              @click="cancelEdit(p.id)"
+              class="text-gray-600 hover:text-gray-800 text-sm font-medium"
+            >
+              Cancel
+            </button>
           </div>
         </div>
       </li>
@@ -51,7 +99,13 @@ onMounted(async () => {
   isAuthenticated.value = true;
   const res = await axios.get(`/api/teams/${route.params.teamId}/projects`);
   projects.value = res.data;
-  projects.value.forEach(p => editData.value[p.id] = { name: p.name, description: p.description, editing: false });
+  projects.value.forEach(p => {
+    editData.value[p.id] = {
+      name: p.name,
+      description: p.description,
+      editing: false,
+    };
+  });
 });
 
 async function addProject() {
@@ -68,12 +122,16 @@ function startEdit(id) {
 
 function cancelEdit(id) {
   editData.value[id].editing = false;
-  editData.value[id].name = projects.value.find(p => p.id === id).name;
-  editData.value[id].description = projects.value.find(p => p.id === id).description;
+  const original = projects.value.find(p => p.id === id);
+  editData.value[id].name = original.name;
+  editData.value[id].description = original.description;
 }
 
 async function updateProject(id) {
-  const payload = { name: editData.value[id].name, description: editData.value[id].description };
+  const payload = {
+    name: editData.value[id].name,
+    description: editData.value[id].description,
+  };
   const { data } = await axios.put(`/api/projects/${id}`, payload);
   const idx = projects.value.findIndex(p => p.id === id);
   projects.value[idx] = data;

@@ -9,7 +9,10 @@
 
     <ul class="space-y-4">
       <li v-for="team in teams" :key="team.id" class="border p-3 rounded">
-        <h3 class="font-semibold">{{ team.name }}</h3>
+        <h3 class="font-semibold flex justify-between items-center">
+          <span>{{ team.name }}</span>
+          <router-link :to="`/teams/${team.id}/projects`" class="text-blue-600 hover:text-blue-800 text-sm">Projects</router-link>
+        </h3>
         <div v-if="isAdmin" class="mt-2 space-y-2">
           <form @submit.prevent="invite(team.id)" class="space-y-2 flex flex-col sm:flex-row sm:space-x-2 sm:space-y-0">
             <input v-model="inviteData[team.id].name" type="text" placeholder="Name" class="border px-2 py-1 rounded" required>

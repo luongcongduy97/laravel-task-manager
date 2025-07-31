@@ -27,7 +27,7 @@
 </template>
 
 <script setup>
-import { computed, ref, onMounted } from 'vue';
+import { computed, ref, onMounted, watch } from 'vue';
 import axios from 'axios';
 import { useRouter, useRoute } from 'vue-router';
 import { isAuthenticated } from '../auth.js';
@@ -43,10 +43,26 @@ const showLogout = computed(() => {
 
 const showTeamLink = computed(() => isAuthenticated.value && isAdmin.value);
 
-onMounted(async () => {
-  if (isAuthenticated.value) {
+async function fetchUserRole() {
+  try {
     const { data } = await axios.get('/api/user');
     isAdmin.value = data.role === 'Admin';
+  } catch (e) {
+    isAdmin.value = false;
+  }
+}
+
+onMounted(async () => {
+  if (isAuthenticated.value) {
+    await fetchUserRole();
+  }
+});
+
+watch(isAuthenticated, async (val) => {
+  if (val) {
+    await fetchUserRole();
+  } else {
+    isAdmin.value = false;
   }
 });
 

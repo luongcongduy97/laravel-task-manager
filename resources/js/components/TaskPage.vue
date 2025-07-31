@@ -3,6 +3,7 @@
     <h2 class="text-3xl font-extrabold bg-gradient-to-r from-purple-600 to-pink-500 text-transparent bg-clip-text text-center">
       Tasks
     </h2>
+    <p v-if="error" class="text-red-600 text-sm text-center">{{ error }}</p>
 
     <div class="flex flex-col sm:flex-row sm:space-x-3 space-y-3 sm:space-y-0">
       <input
@@ -10,11 +11,13 @@
         placeholder="Name"
         class="border px-3 py-2 rounded-md w-full focus:ring-2 focus:ring-purple-500 transition"
       />
-      <input
+      <select
         v-model="newTask.status"
-        placeholder="Status"
         class="border px-3 py-2 rounded-md w-full focus:ring-2 focus:ring-purple-500 transition"
-      />
+      >
+        <option disabled value="">Status</option>
+        <option v-for="s in statuses" :key="s" :value="s">{{ formatStatus(s) }}</option>
+      </select>
       <input
         v-model="newTask.priority"
         placeholder="Priority"
@@ -65,23 +68,30 @@
         <div v-else class="space-y-3">
           <input
             v-model="editData[t.id].name"
+            placeholder="Name"
             class="border px-3 py-2 rounded-md w-full focus:ring-2 focus:ring-purple-500 transition"
           />
           <input
             v-model="editData[t.id].description"
+            placeholder="Description"
             class="border px-3 py-2 rounded-md w-full focus:ring-2 focus:ring-purple-500 transition"
           />
-          <input
+          <select
             v-model="editData[t.id].status"
             class="border px-3 py-2 rounded-md w-full focus:ring-2 focus:ring-purple-500 transition"
-          />
+          >
+            <option disabled value="">Status</option>
+            <option v-for="s in statuses" :key="s" :value="s">{{ formatStatus(s) }}</option>
+          </select>
           <input
             v-model="editData[t.id].priority"
+            placeholder="Priority"
             class="border px-3 py-2 rounded-md w-full focus:ring-2 focus:ring-purple-500 transition"
           />
           <input
             v-model="editData[t.id].due_date"
             type="date"
+            placeholder="Due Date"
             class="border px-3 py-2 rounded-md w-full focus:ring-2 focus:ring-purple-500 transition"
           />
           <div class="flex space-x-3">
@@ -115,6 +125,12 @@ const route = useRoute();
 const tasks = ref([]);
 const newTask = ref({ name: '', description: '', status: '', priority: '', due_date: '' });
 const editData = ref({});
+const statuses = ['pending', 'in_progress', 'completed'];
+const error = ref('');
+
+function formatStatus(s) {
+  return s.replace('_', ' ');
+}
 
 onMounted(async () => {
   const token = localStorage.getItem('token');
@@ -132,11 +148,19 @@ onMounted(async () => {
 });
 
 async function addTask() {
-  if (!newTask.value.name) return;
-  const { data } = await axios.post(`/api/projects/${route.params.projectId}/tasks`, newTask.value);
-  tasks.value.push(data);
-  editData.value[data.id] = { ...data, editing: false };
-  newTask.value = { name: '', description: '', status: '', priority: '', due_date: '' };
+  error.value = '';
+  if (!newTask.value.name) {
+    error.value = 'Name is required';
+    return;
+  }
+  try {
+    const { data } = await axios.post(`/api/projects/${route.params.projectId}/tasks`, newTask.value);
+    tasks.value.push(data);
+    editData.value[data.id] = { ...data, editing: false };
+    newTask.value = { name: '', description: '', status: '', priority: '', due_date: '' };
+  } catch (e) {
+    error.value = e.response?.data?.message || 'Failed to add task';
+  }
 }
 
 function startEdit(id) {

@@ -4,6 +4,7 @@ import Register from './components/Register.vue';
 import UserPage from './components/UserPage.vue';
 import TeamPage from './components/TeamPage.vue';
 import ProjectPage from './components/ProjectPage.vue';
+import TaskPage from './components/TaskPage.vue';
 import { isAuthenticated } from './auth.js';
 
 const routes = [
@@ -13,6 +14,7 @@ const routes = [
   { path: '/users', component: UserPage, meta: { requiresAuth: true } },
   { path: '/teams', component: TeamPage, meta: { requiresAuth: true } },
   { path: '/teams/:teamId/projects', component: ProjectPage, meta: { requiresAuth: true } },
+  { path: '/projects/:projectId/tasks', component: TaskPage, meta: { requiresAuth: true } },
 ];
 
 const router = createRouter({

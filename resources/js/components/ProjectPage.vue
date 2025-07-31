@@ -7,7 +7,7 @@
     <div class="flex flex-col sm:flex-row sm:space-x-3 space-y-3 sm:space-y-0">
       <input
         v-model="newProject.name"
-        placeholder="Project name"
+        placeholder="Name"
         class="border px-3 py-2 rounded-md w-full focus:ring-2 focus:ring-purple-500 transition"
       />
       <input
@@ -31,7 +31,15 @@
       >
         <!-- Normal View -->
         <div v-if="!editData[p.id].editing">
-          <h3 class="text-lg font-semibold text-gray-800">{{ p.name }}</h3>
+          <div class="flex justify-between items-center">
+            <h3 class="text-lg font-semibold text-gray-800">{{ p.name }}</h3>
+            <router-link
+              :to="`/projects/${p.id}/tasks`"
+              class="text-blue-600 hover:text-blue-800 text-sm font-medium"
+            >
+              View Tasks →
+            </router-link>
+          </div>
           <p class="text-sm text-gray-600 mt-1" v-if="p.description">{{ p.description }}</p>
           <div class="flex space-x-4 mt-3">
             <button @click="startEdit(p.id)" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
